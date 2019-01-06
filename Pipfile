@@ -12,6 +12,8 @@ flask-migrate = "*"
 
 [dev-packages]
 pytest = "*"
+flask-testing = "*"
+webtest = "*"
 
 [requires]
 python_version = "3.6"

@@ -159,4 +159,6 @@ fabric.properties
 .idea/httpRequests
 
 *.xml
-/static/node_modules/**/*
+/static/node_modules
+/static/dist
+/static/yarn-error.log

@@ -1,9 +1,9 @@
-from . import db, bcrypt
+from .database import CRUDMixin, db, Column, bcrypt
 
-class User(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    email = db.Column(db.String(255), unique=True)
-    password = db.Column(db.String(255))
+class User(CRUDMixin, db.Model):
+    id = Column(db.Integer(), primary_key=True)
+    email = Column(db.String(255), unique=True)
+    password = Column(db.String(255))
 
     def __init__(self, email, password):
         self.email = email
