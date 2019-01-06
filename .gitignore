@@ -162,3 +162,4 @@ fabric.properties
 /static/node_modules
 /static/dist
 /static/yarn-error.log
+*.iml
