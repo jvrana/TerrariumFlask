@@ -1,18 +1,17 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { ConnectedRouter } from 'connected-react-router'
-import routes from './routes'
+import React, { Component } from 'react'
+import Navigation from "./components/Navigation";
 
-const App = ({ history }) => {
-  return (
-    <ConnectedRouter history={history}>
-      { routes }
-    </ConnectedRouter>
-  )
-};
+class App extends Component { // eslint-disable-line react/prefer-stateless-function
 
-App.propTypes = {
-  history: PropTypes.object,
-};
+
+    render() {
+        return (
+                <section>
+                  <Navigation />
+                        {this.props.children}
+                </section>
+        );
+    }
+}
 
 export default App;

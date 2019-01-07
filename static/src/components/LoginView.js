@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as actionCreators from '../actions/auth';
 import { isEmail, isURL } from 'validator';
+import RouterLink from "./RouterLink";
 
 
 function mapStateToProps(state) {
@@ -17,7 +18,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(actionCreators, dispatch);
 }
-
 
 class LoginView extends Component {
 
@@ -114,14 +114,14 @@ class LoginView extends Component {
             }
             <Form>
             <Form.Group controlId="formBasicEmail">
-                <Form.Label>Aquarium Email</Form.Label>
-                <Form.Control type="email" placeholder="Enter Aquarium Email" onChange={(e) => this.changeValue(e, 'email')}/>
+                <Form.Label>Email</Form.Label>
+                <Form.Control type="email" placeholder="Enter Email" onChange={(e) => this.changeValue(e, 'email')}/>
                 <Form.Text className="text-muted">{email_error_text}</Form.Text>
             </Form.Group>
 
             <Form.Group controlId="formBasicPassword">
-                <Form.Label>Aquarium Password</Form.Label>
-                <Form.Control type="password" placeholder="Enter Aquarium Password" onChange={(e) => this.changeValue(e, 'password')}/>
+                <Form.Label>Password</Form.Label>
+                <Form.Control type="password" placeholder="Enter Password" onChange={(e) => this.changeValue(e, 'password')}/>
                 <Form.Text className="text-muted">{password_error_text}</Form.Text>
             </Form.Group>
 

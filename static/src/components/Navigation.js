@@ -1,19 +1,16 @@
-import React, { Component } from 'react'
-import {Breadcrumb, Nav, Navbar} from 'react-bootstrap'
+import React, {Component} from 'react'
+import {Breadcrumb, Nav, Navbar, Badge, Button} from 'react-bootstrap'
 import connect from "react-redux/es/connect/connect";
-import { bindActionCreators } from 'redux';
-import WithStore from './WithStore';
-import * as actionCreators from '../actions/auth';
+import {PROJECT_NAME} from '../constants/application';
+import RouterLink from './RouterLink';
+import LogoutView from './LogoutView';
 
 function mapStateToProps(state) {
     return {
         token: state.auth.token,
         userName: state.auth.userName,
+        isAuthenticated: state.auth.isAuthenticated,
     };
-}
-
-function mapDispatchToProps(dispatch) {
-    return bindActionCreators(actionCreators, dispatch);
 }
 
 class SignInToken extends Component {
@@ -25,39 +22,45 @@ class SignInToken extends Component {
     }
 
     render() {
-        console.log("RENDER")
+        console.log(this.props);
         return (
             <div>
-                <WithStore>
-                    {(state, dispatch)} => {
-                    <Navbar.Text>
-                        Signed in as: <a href="/login">{state.token}</a>
-                    </Navbar.Text>
+                {this.props.userName ? (
+                    <Button variant="success">{this.props.userName} <Badge variant="light">9</Badge></Button>
+                ) : (
+                    <RouterLink to="/login">
+                        <Button variant="danger">Sign in</Button>
+                    </RouterLink>
+                )
                 }
-                </WithStore>
             </div>
         )
     }
 }
 
-const LoginToken = connect(mapStateToProps, mapDispatchToProps) (SignInToken)
+const LoginToken = connect(mapStateToProps)(SignInToken);
 
 const Navigation = () => (
     <div>
         <Navbar bg="dark" variant="dark" expand="lg">
-            <Navbar.Brand href={"#home"}>Terrarium</Navbar.Brand>
+            <RouterLink to={"/home"}>
+                <Navbar.Brand>{PROJECT_NAME}</Navbar.Brand>
+            </RouterLink>
             <Navbar.Toggle/>
 
             <Navbar.Collapse>
                 <Nav>
-                <Nav.Link href="/home">Home</Nav.Link>
-                <Nav.Link href="/login">Login</Nav.Link>
-                <Nav.Link href="/register">Sign Up</Nav.Link>
-                    <Nav.Link href="/logout">Logout</Nav.Link>
+                    <RouterLink to="/home"><Nav.Link>Home</Nav.Link></RouterLink>
+                    <RouterLink to={'/login'}><Nav.Link>Login</Nav.Link></RouterLink>
+                    <RouterLink to={'/register'}><Nav.Link>Sign Up</Nav.Link></RouterLink>
+                    <RouterLink to={'/logout'}><Nav.Link>Logout</Nav.Link></RouterLink>
+                    <RouterLink to={'/user'}><Nav.Link>User</Nav.Link></RouterLink>
+
                 </Nav>
             </Navbar.Collapse>
 
-                <LoginToken />
+            <LoginToken/>
+            <LogoutView />
         </Navbar>
         <Breadcrumb>
             <Breadcrumb.Item href="/">Home</Breadcrumb.Item>

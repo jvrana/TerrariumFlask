@@ -1,4 +1,4 @@
-from testing_config import BaseTestConfig
+
 from application.models import User
 import json
 from application.utils import auth

@@ -1,4 +1,5 @@
 import {createReducer} from '../utils/misc'
+import jwtDecode from 'jwt-decode';
 
 import {
     LOGIN_USER_SUCCESS,
@@ -30,10 +31,10 @@ export default createReducer(initialState, {
             isAuthenticating: false,
             isAuthenticated: true,
             token: payload.token,
-            userName: payload.token,
+            userName: jwtDecode(payload.token).email,
             statusText: 'You have been successfully logged in.'
         }),
-            [LOGIN_USER_FAILURE]: (state, payload) =>
+    [LOGIN_USER_FAILURE]: (state, payload) =>
     Object.assign({}, state, {
         isAuthenticating: false,
         isAuthenticated: false,

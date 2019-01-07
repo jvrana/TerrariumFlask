@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, render_template, request, g
 from application.utils.auth import generate_token, requires_auth, verify_token
 from sqlalchemy.exc import IntegrityError
-from application.models import User
+from application.models import User, APIConnection
 from application.extensions import db
 
 bp = Blueprint('api', __name__, url_prefix='/api')
+
 
 @bp.route('/', methods=['GET'])
 def api():
@@ -30,22 +31,14 @@ def get_user():
 @bp.route("/create_user", methods=["POST"])
 def create_user():
     incoming = request.get_json()
-    user = User(
-        email=incoming["email"],
-        password=incoming["password"]
-    )
-    db.session.add(user)
-
     try:
-        db.session.commit()
-    except IntegrityError:
-        return jsonify(message="User with that email already exists"), 409
-
-    new_user = User.query.filter_by(email=incoming["email"]).first()
+        user = User.create(**incoming)
+    except IntegrityError as e:
+        return jsonify(message="User creation failed. User with that email already exists."), 409
 
     return jsonify(
         id=user.id,
-        token=generate_token(new_user)
+        token=generate_token(user)
     )
 
 
@@ -61,10 +54,51 @@ def get_token():
 
 @bp.route("/is_token_valid", methods=["POST"])
 def is_token_valid():
-    incoming = request.get_json()
+    try:
+        incoming = request.get_json()
+    except:
+        return jsonify(token_is_valid=False), 403
     is_valid = verify_token(incoming["token"])
 
     if is_valid:
         return jsonify(token_is_valid=True)
     else:
         return jsonify(token_is_valid=False), 403
+
+
+@bp.route("/create_connection", methods=["POST"])
+def create_api_connection():
+    incoming = request.get_json()
+    data = dict(incoming)
+    try:
+        api_connection = APIConnection.create(**data)
+    except IntegrityError as e:
+        return jsonify(message="APIConnection creation failed. User with that email already exists."), 409
+
+    return jsonify(
+        id=api_connection.id,
+        token=generate_token(api_connection, keys=['login', 'url', 'id'])
+    )
+
+#
+# @bp.route("/create_connection", methods=["POST"])
+# def create_user():
+#     incoming = request.get_json()
+#     user = APIConnection(
+#         login=incoming["login"],
+#         password=incoming["password"],
+#         url=incoming["url"]
+#     )
+#     db.session.add(user)
+#
+#     try:
+#         db.session.commit()
+#     except IntegrityError:
+#         return jsonify(message="User with that email already exists"), 409
+#
+#     new_user = User.query.filter_by(email=incoming["email"]).first()
+#
+#     return jsonify(
+#         id=user.id,
+#         token=generate_token(new_user)
+#     )

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Form} from 'react-bootstrap';
+import {Alert, Button, Form} from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as actionCreators from '../actions/auth';
@@ -9,7 +9,7 @@ import { isEmail, isURL } from 'validator';
 function mapStateToProps(state) {
     return {
         isAuthenticating: state.auth.isAuthenticating,
-        statusText: state.auth.statusText,
+        registerStatusText: state.auth.registerStatusText,
     };
 }
 
@@ -116,20 +116,24 @@ class RegisterView extends Component {
     }
 
     render() {
-        const { disabled, email_error_text, password_error_text, url_error_text } = this.state;
+        const { disabled, email_error_text, password_error_text } = this.state;
         return <div>
             <h3>Create Account</h3>
             <p>Input your Aquarium login credentials below</p>
+            {
+                this.props.registerStatusText &&
+                <Alert variant='danger'>{this.props.registerStatusText}</Alert>
+            }
             <Form>
             <Form.Group controlId="formBasicEmail">
-                <Form.Label>Aquarium Email</Form.Label>
-                <Form.Control type="email" placeholder="Enter Aquarium Email" onChange={(e) => this.changeValue(e, 'email')}/>
+                <Form.Label>Email</Form.Label>
+                <Form.Control type="email" placeholder="Enter Email" onChange={(e) => this.changeValue(e, 'email')}/>
                 <Form.Text className="text-muted">{email_error_text}</Form.Text>
             </Form.Group>
 
             <Form.Group controlId="formBasicPassword">
-                <Form.Label>Aquarium Password</Form.Label>
-                <Form.Control type="password" placeholder="Enter Aquarium Password" onChange={(e) => this.changeValue(e, 'password')}/>
+                <Form.Label>Password</Form.Label>
+                <Form.Control type="password" placeholder="Enter Password" onChange={(e) => this.changeValue(e, 'password')}/>
                 <Form.Text className="text-muted">{password_error_text}</Form.Text>
             </Form.Group>
 

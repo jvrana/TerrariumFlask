@@ -1,34 +1,24 @@
-import { AppContainer } from 'react-hot-loader'
-import { applyMiddleware, compose, createStore } from 'redux'
-import { createBrowserHistory } from 'history'
-import { routerMiddleware } from 'connected-react-router'
-import { Provider } from 'react-redux'
+import {AppContainer} from 'react-hot-loader'
+import {Provider} from 'react-redux'
 import React from 'react'
-import { render } from 'react-dom'
+import {render} from 'react-dom'
 import App from './App'
-import rootReducer from './reducers/index'
-import thunk from 'redux-thunk';
-
-const history = createBrowserHistory();
-
-const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-const store = createStore(
-  rootReducer(history),
-  composeEnhancer(
-    applyMiddleware(
-      routerMiddleware(history), thunk
-    ),
-  ),
-);
+import history from './history';
+import store from './store/configureStore';
+import {Router} from "react-router";
+import routes from "./routes";
 
 render(
-    <AppContainer>
-      <Provider store={store}>
-        <App history={history} />
-      </Provider>
-    </AppContainer>,
+    <Provider store={store}>
+        <Router history={history}>
+            <App>
+          { routes }
+            </App>
+        </Router>
+    </Provider>,
     document.getElementById('root')
-  );
+);
+
 
 // // Hot reloading
 // if (module.hot) {

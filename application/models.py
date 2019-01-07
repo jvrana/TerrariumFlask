@@ -1,9 +1,13 @@
-from .database import CRUDMixin, db, Column, bcrypt
+from sqlalchemy import ForeignKey, Integer
+
+from .database import CRUDMixin, db, Column, bcrypt, relationship
+
 
 class User(CRUDMixin, db.Model):
     id = Column(db.Integer(), primary_key=True)
     email = Column(db.String(255), unique=True)
     password = Column(db.String(255))
+    api_connections = relationship("APIConnection", back_populates="user")
 
     def __init__(self, email, password):
         self.email = email
@@ -19,5 +23,35 @@ class User(CRUDMixin, db.Model):
         user = User.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
             return user
+        else:
+            return None
+
+
+class APIConnection(CRUDMixin, db.Model):
+    __tablename__ = 'api_connection'
+
+    id = Column(db.Integer(), primary_key=True)
+    login = Column(db.String(255), unique=True)
+    password = Column(db.String(255))
+    url = Column(db.String(255))
+    user = relationship("User", back_populates="api_connections")
+    user_id = Column(Integer, ForeignKey('user.id'))
+
+    def __init__(self, login, password, url, user):
+        self.login = login
+        self.active = True
+        self.password = APIConnection.hashed_password(password)
+        self.url = url
+        self.user = user
+
+    @staticmethod
+    def hashed_password(password):
+        return bcrypt.generate_password_hash(password).decode("utf-8")
+
+    @staticmethod
+    def get_user_with_login_and_password(login, password):
+        connection = APIConnection.query.filter_by(email=login).first()
+        if connection and bcrypt.check_password_hash(connection.password, password):
+            return connection
         else:
             return None

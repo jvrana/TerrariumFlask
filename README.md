@@ -2,7 +2,11 @@
 
 **Starting backend**:
 
+`python manage.py runserver`
 
+**Starting front-end**:
+
+`cd static; yarn start`
 
 ## Software Stack
 

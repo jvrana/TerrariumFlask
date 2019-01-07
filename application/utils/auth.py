@@ -7,12 +7,10 @@ from flask import current_app
 TWO_WEEKS = 1209600
 
 
-def generate_token(user, expiration=TWO_WEEKS):
+def generate_token(model, expiration=TWO_WEEKS, keys=['id', 'email']):
     s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
-    token = s.dumps({
-        'id': user.id,
-        'email': user.email,
-    }).decode('utf-8')
+    data = {k: getattr(model, k) for k in keys}
+    token = s.dumps(data).decode('utf-8')
     return token
 
 
