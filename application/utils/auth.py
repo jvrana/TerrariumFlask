@@ -3,6 +3,7 @@ from flask import request, g, jsonify
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired, BadSignature
 from flask import current_app
+from application.models import User
 
 TWO_WEEKS = 1209600
 
@@ -21,6 +22,12 @@ def verify_token(token):
     except (BadSignature, SignatureExpired):
         return None
     return data
+
+
+def user_from_token(token):
+    data = verify_token(token)
+    user = User.query.filter_by(id=data['id']).first()
+    return
 
 
 def requires_auth(f):

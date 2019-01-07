@@ -11,11 +11,12 @@ export function create_user(email, password) {
     });
 }
 
-export function create_connection(login, password, url) {
+export function create_connection(login, password, url, token) {
     return axios.post('/api/create_connection', {
         login,
         password,
-        url
+        url,
+        token
     });
 }
 

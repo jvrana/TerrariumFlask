@@ -26,10 +26,10 @@ export function connectionFail(error) {
     }
 }
 
-export function register(login, password, url) {
+export function register(login, password, url, token) {
     return function (dispatch) {
         dispatch(connectionRequest())
-        return create_connection(login, password, url)
+        return create_connection(login, password, url, token)
             .then(response => {
                 try {
                     dispatch(connectionSuccess(response.data.token));

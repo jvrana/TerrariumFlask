@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, render_template, request, g
-from application.utils.auth import generate_token, requires_auth, verify_token
+from application.utils.auth import generate_token, requires_auth, verify_token, user_from_token
 from sqlalchemy.exc import IntegrityError
 from application.models import User, APIConnection
 from application.extensions import db
@@ -70,6 +70,7 @@ def is_token_valid():
 def create_api_connection():
     incoming = request.get_json()
     data = dict(incoming)
+    data['user'] = user_from_token(data.pop('token'))
     try:
         api_connection = APIConnection.create(**data)
     except IntegrityError as e:
@@ -79,6 +80,10 @@ def create_api_connection():
         id=api_connection.id,
         token=generate_token(api_connection, keys=['login', 'url', 'id'])
     )
+
+@bp.route("/user/<user_id>/connections")
+def connections():
+
 
 #
 # @bp.route("/create_connection", methods=["POST"])

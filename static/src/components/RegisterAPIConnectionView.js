@@ -10,7 +10,8 @@ function mapStateToProps(state) {
     return {
         isAuthenticating: state.connect.isAuthenticating,
         statusText: state.connect.statusText,
-        isAuthenticated: state.connect.isAuthenticated
+        isAuthenticated: state.connect.isAuthenticated,
+        token: state.auth.token
     };
 }
 
@@ -63,7 +64,7 @@ class ConnectionView extends Component {
     register(e) {
         e.preventDefault();
         console.log(this.props);
-        this.props.register(this.state.login, this.state.password, this.state.url);
+        this.props.register(this.state.login, this.state.password, this.state.url, this.props.token);
     }
 
     render() {

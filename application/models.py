@@ -42,16 +42,9 @@ class APIConnection(CRUDMixin, db.Model):
         self.active = True
         self.password = APIConnection.hashed_password(password)
         self.url = url
+        print(user)
         self.user = user
 
     @staticmethod
     def hashed_password(password):
         return bcrypt.generate_password_hash(password).decode("utf-8")
-
-    @staticmethod
-    def get_user_with_login_and_password(login, password):
-        connection = APIConnection.query.filter_by(email=login).first()
-        if connection and bcrypt.check_password_hash(connection.password, password):
-            return connection
-        else:
-            return None
