@@ -26,6 +26,9 @@ class User(CRUDMixin, db.Model):
         else:
             return None
 
+    def __json__(self):
+        return ['id', 'email']
+
 
 class APIConnection(CRUDMixin, db.Model):
     __tablename__ = 'api_connection'
@@ -48,3 +51,6 @@ class APIConnection(CRUDMixin, db.Model):
     @staticmethod
     def hashed_password(password):
         return bcrypt.generate_password_hash(password).decode("utf-8")
+
+    def __json__(self):
+        return ['id', 'login', 'url', 'user_id', 'user']

@@ -67,7 +67,7 @@ def is_token_valid():
 
 
 @bp.route("/create_connection", methods=["POST"])
-def create_api_connection():
+def create_connection():
     incoming = request.get_json()
     data = dict(incoming)
     data['user'] = user_from_token(data.pop('token'))
@@ -81,8 +81,16 @@ def create_api_connection():
         token=generate_token(api_connection, keys=['login', 'url', 'id'])
     )
 
-@bp.route("/user/<user_id>/connections")
-def connections():
+@bp.route('/user/<user_id>', methods=['GET'])
+def user(user_id):
+    print(user_id)
+    return jsonify(User.query.filter_by(id=user_id).first())
+
+
+@bp.route("/user/<user_id>/connections", methods=['GET'])
+def connections(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    return jsonify(user.api_connections)
 
 
 #

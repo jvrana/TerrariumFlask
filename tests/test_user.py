@@ -48,6 +48,22 @@ class TestUser:
 
         assert res2.status_code == 409
 
+    def test_get_user(self, client):
+        assert not User.query.filter_by(
+            email=self.some_user["email"]
+        ).first()
+
+        res = client.post(
+            "/api/create_user",
+            data=json.dumps(self.some_user),
+            content_type='application/json'
+        )
+
+        user_id = res.json['id']
+
+        user = client.get('/api/user/{}'.format(user_id))
+        assert user
+
     def test_get_token_and_verify_token(self, client):
         res = client.post(
                 "/api/get_token",
