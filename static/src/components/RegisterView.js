@@ -1,10 +1,39 @@
 import React, {Component} from 'react';
 import {Alert, Button, Form} from 'react-bootstrap';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import * as actionCreators from '../actions/auth';
-import { isEmail, isURL } from 'validator';
+import {isEmail, isURL} from 'validator';
 
+import {Mutation} from 'react-apollo';
+import gql from "graphql-tag";
+import history from '../history'
+const ADD_USER = gql`mutation createUser($email: String!, $password: String!) {
+  createUser(email:$email, password:$password){
+    user {
+      id
+    }
+    token
+  }
+}
+`;
+
+const AddUser = ({email, password, disabled}) => {
+    return (
+        <Mutation mutation={ADD_USER}>
+            {(addUser, {data}) => {
+                return (<Button variant="primary"
+                        type="submit"
+                        onClick={(e) => (
+                            addUser({variables: {email: email, password: password}})
+                        )}
+                        disabled={disabled}>
+                    Create
+                </Button>)
+            }}
+        </Mutation>
+    )
+};
 
 function mapStateToProps(state) {
     return {
@@ -116,7 +145,7 @@ class RegisterView extends Component {
     }
 
     render() {
-        const { disabled, email_error_text, password_error_text } = this.state;
+        const {disabled, email_error_text, password_error_text} = this.state;
         return <div>
             <h3>Create Account</h3>
             <p>Input your Aquarium login credentials below</p>
@@ -125,23 +154,23 @@ class RegisterView extends Component {
                 <Alert variant='danger'>{this.props.registerStatusText}</Alert>
             }
             <Form>
-            <Form.Group controlId="formBasicEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control type="email" placeholder="Enter Email" onChange={(e) => this.changeValue(e, 'email')}/>
-                <Form.Text className="text-muted">{email_error_text}</Form.Text>
-            </Form.Group>
+                <Form.Group controlId="formBasicEmail">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control type="email" placeholder="Enter Email"
+                                  onChange={(e) => this.changeValue(e, 'email')}/>
+                    <Form.Text className="text-muted">{email_error_text}</Form.Text>
+                </Form.Group>
 
-            <Form.Group controlId="formBasicPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control type="password" placeholder="Enter Password" onChange={(e) => this.changeValue(e, 'password')}/>
-                <Form.Text className="text-muted">{password_error_text}</Form.Text>
-            </Form.Group>
-
-            <Button variant="primary" type="submit" onClick={(e) => this.register(e)} disabled={disabled}>
-                Create
-            </Button>
-        </Form></div>
+                <Form.Group controlId="formBasicPassword">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control type="password" placeholder="Enter Password"
+                                  onChange={(e) => this.changeValue(e, 'password')}/>
+                    <Form.Text className="text-muted">{password_error_text}</Form.Text>
+                </Form.Group>
+                <AddUser email={this.state.email} password={this.state.password} disabled={this.state.disabled}/>
+            </Form>
+        </div>
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps) (RegisterView)
+export default connect(mapStateToProps, mapDispatchToProps)(RegisterView)

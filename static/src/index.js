@@ -1,4 +1,3 @@
-import {AppContainer} from 'react-hot-loader'
 import {Provider} from 'react-redux'
 import React from 'react'
 import {render} from 'react-dom'
@@ -7,13 +6,33 @@ import history from './history';
 import store from './store/configureStore';
 import {Router} from "react-router";
 import routes from "./routes";
+import {ApolloProvider} from 'react-apollo';
+import client from '../client';
+import gql from "graphql-tag";
+
+const USERS = gql`
+{
+  users {
+    id
+    email
+  }
+}
+`;
+
+client.query({query: USERS}).then(
+    (response) => {
+        console.log(response)
+    }
+);
 
 render(
     <Provider store={store}>
         <Router history={history}>
-            <App>
-          { routes }
-            </App>
+            <ApolloProvider client={client}>
+                <App>
+                    {routes}
+                </App>
+            </ApolloProvider>
         </Router>
     </Provider>,
     document.getElementById('root')

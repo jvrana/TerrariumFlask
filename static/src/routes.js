@@ -11,10 +11,10 @@ const routes = (
         <Route exact path="/" >
             <Redirect from="/" to="/home"/>
         </Route>
-        <Route path="/home" component={requireAuthentication(Home)}/>
+        <Route path="/home" component={Home}/>
         <Route path="/login" component={LoginView}/>
         <Route path="/register" component={RegisterView}/>
-        <Route path="/user" component={requireAuthentication(UserView)}/>
+        <Route path="/user" component={UserView}/>
     </Switch>
 );
 

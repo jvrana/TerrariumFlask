@@ -1,6 +1,9 @@
 from sqlalchemy import ForeignKey, Integer
-
+from sqlalchemy.ext.declarative import declarative_base
 from .database import CRUDMixin, db, Column, bcrypt, relationship
+from application.utils.auth import generate_token, verify_token
+
+# Base = declarative_base()
 
 
 class User(CRUDMixin, db.Model):
@@ -13,6 +16,15 @@ class User(CRUDMixin, db.Model):
         self.email = email
         self.active = True
         self.password = User.hashed_password(password)
+
+    def generate_token(self):
+        return generate_token(self, keys=['id', 'email'])
+
+    @classmethod
+    def from_token(cls, token):
+        data = verify_token(token)
+        model = cls.query.filter_by(id=data['id']).first()
+        return model
 
     @staticmethod
     def hashed_password(password):
@@ -34,7 +46,7 @@ class APIConnection(CRUDMixin, db.Model):
     __tablename__ = 'api_connection'
 
     id = Column(db.Integer(), primary_key=True)
-    login = Column(db.String(255), unique=True)
+    login = Column(db.String(25))
     password = Column(db.String(255))
     url = Column(db.String(255))
     user = relationship("User", back_populates="api_connections")
@@ -51,6 +63,16 @@ class APIConnection(CRUDMixin, db.Model):
     @staticmethod
     def hashed_password(password):
         return bcrypt.generate_password_hash(password).decode("utf-8")
+
+    def generate_token(self):
+        token = generate_token(self, keys=['login', 'url', 'id'])
+        return token
+
+    @classmethod
+    def from_token(cls, token):
+        data = verify_token(token)
+        model = cls.query.filter_by(id=data['id']).first()
+        return model
 
     def __json__(self):
         return ['id', 'login', 'url', 'user_id', 'user']
