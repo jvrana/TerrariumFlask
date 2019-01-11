@@ -3,7 +3,7 @@ import os
 here = os.path.dirname(os.path.abspath(__file__))
 
 class BaseConfig(object):
-    SECRET_KEY = "SO_SECURE"
+    SECRET_KEY = "He<Zv]A!k9/bX's"
     DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     STATIC_FOLDER = 'static'

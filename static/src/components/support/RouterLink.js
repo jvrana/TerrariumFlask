@@ -1,6 +1,6 @@
 import {Route} from "react-router-dom";
 import React from "react";
-import history from '../history';
+import history from '../../history';
 
 // Wraps an element in a router link
 const RouterLink = (props) => {

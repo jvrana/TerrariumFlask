@@ -1,44 +1,7 @@
-import React, {Component} from 'react'
-import {Breadcrumb, Nav, Navbar, Badge, Button} from 'react-bootstrap'
-import connect from "react-redux/es/connect/connect";
-import {PROJECT_NAME} from '../constants/application';
-import RouterLink from './RouterLink';
-import LogoutView from './LogoutView';
-
-function mapStateToProps(state) {
-    return {
-        token: state.auth.token,
-        userName: state.auth.userName,
-        isAuthenticated: state.auth.isAuthenticated,
-    };
-}
-
-class SignInToken extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            logged_in: false
-        };
-    }
-
-    render() {
-        console.log(this.props);
-        return (
-            <div>
-                {this.props.userName ? (
-                    <Button variant="success">{this.props.userName} <Badge variant="light">9</Badge></Button>
-                ) : (
-                    <RouterLink to="/login">
-                        <Button variant="danger">Sign in</Button>
-                    </RouterLink>
-                )
-                }
-            </div>
-        )
-    }
-}
-
-const LoginToken = connect(mapStateToProps)(SignInToken);
+import React from 'react'
+import {Breadcrumb, Nav, Navbar} from 'react-bootstrap'
+import {PROJECT_NAME} from '../constants';
+import RouterLink from './support/RouterLink';
 
 const Navigation = () => (
     <div>
@@ -55,12 +18,12 @@ const Navigation = () => (
                     <RouterLink to={'/register'}><Nav.Link>Sign Up</Nav.Link></RouterLink>
                     <RouterLink to={'/logout'}><Nav.Link>Logout</Nav.Link></RouterLink>
                     <RouterLink to={'/user'}><Nav.Link>User</Nav.Link></RouterLink>
-
+                    <RouterLink to={'/users'}><Nav.Link>Users</Nav.Link></RouterLink>
                 </Nav>
             </Navbar.Collapse>
 
-            <LoginToken/>
-            <LogoutView />
+            {/*<LoginToken/>*/}
+            {/*<LogoutView />*/}
         </Navbar>
         <Breadcrumb>
             <Breadcrumb.Item href="/">Home</Breadcrumb.Item>

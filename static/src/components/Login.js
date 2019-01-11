@@ -1,53 +1,34 @@
-import React, {Component} from 'react';
+import React from 'react';
+import {Query} from 'react-apollo';
 import {Alert, Button, Form} from 'react-bootstrap';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
-import * as actionCreators from '../actions/auth';
 import {isEmail, isURL} from 'validator';
+import {AUTH_TOKEN} from '../constants';
 
-import {Mutation} from 'react-apollo';
-import gql from "graphql-tag";
-import history from '../history'
-const ADD_USER = gql`mutation createUser($email: String!, $password: String!) {
-  createUser(email:$email, password:$password){
-    user {
-      id
+import gql from 'graphql-tag';
+
+const GET_USER = gql`
+    query getToken($email: String!, $password: String!) {
+        token(email: $email, password: $password)
     }
-    token
-  }
-}
 `;
 
-const AddUser = ({email, password, disabled}) => {
-    return (
-        <Mutation mutation={ADD_USER}>
-            {(addUser, {data}) => {
-                return (<Button variant="primary"
-                        type="submit"
-                        onClick={(e) => (
-                            addUser({variables: {email: email, password: password}})
-                        )}
-                        disabled={disabled}>
-                    Create
-                </Button>)
-            }}
-        </Mutation>
-    )
-};
+const Login = ({email, password}) => (
+    <Query query={GET_USER} variables={{email, password}}>
+        {
+            ({loading, error, data}) => {
+                if (loading) return "Loading...";
 
-function mapStateToProps(state) {
-    return {
-        isAuthenticating: state.auth.isAuthenticating,
-        registerStatusText: state.auth.registerStatusText,
-    };
-}
+                if (error) return <Alert variant={"danger"}>Error! {error.message}</Alert>;
 
-function mapDispatchToProps(dispatch) {
-    return bindActionCreators(actionCreators, dispatch);
-}
+                if (data.errors) return 'Error!';
+                localStorage.setItem(AUTH_TOKEN, data.token);
+                return <Alert key={2} variant={"success"}> Logged in</Alert>
+            }
+        }
+    </Query>
+);
 
-
-class RegisterView extends Component {
+class LoginView extends React.Component {
 
     constructor() {
         super();
@@ -56,6 +37,7 @@ class RegisterView extends Component {
             email: "",
             password: "",
             url: "",
+            login: false,
             email_error_text: null,
             password_error_text: null,
             url_error_text: null,
@@ -69,7 +51,6 @@ class RegisterView extends Component {
     isDisabled() {
         let email_is_valid = false;
         let password_is_valid = false;
-        let url_is_valid = true;
 
         if (isEmail(this.state.email)) {
             email_is_valid = true;
@@ -98,18 +79,7 @@ class RegisterView extends Component {
 
         }
 
-        if (isURL(this.state.url)) {
-            url_is_valid = true;
-            this.setState({
-                url_error_text: null,
-            })
-        } else {
-            this.setState({
-                url_error_text: 'Invalid url'
-            })
-        }
-
-        if (email_is_valid && password_is_valid && url_is_valid) {
+        if (email_is_valid && password_is_valid) {
             this.setState({
                 disabled: false,
             });
@@ -126,6 +96,7 @@ class RegisterView extends Component {
         const value = e.target.value;
         const next_state = {};
         next_state[type] = value;
+        this.setState({login: false});
         this.setState(next_state, () => {
             this.isDisabled();
         });
@@ -139,19 +110,18 @@ class RegisterView extends Component {
         }
     }
 
-    register(e) {
+    login(e) {
         e.preventDefault();
-        this.props.registerUser(this.state.email, this.state.password);
+        this.setState({'login': true});
     }
 
     render() {
         const {disabled, email_error_text, password_error_text} = this.state;
         return <div>
-            <h3>Create Account</h3>
-            <p>Input your Aquarium login credentials below</p>
+            <h3>Sign in</h3>
             {
-                this.props.registerStatusText &&
-                <Alert variant='danger'>{this.props.registerStatusText}</Alert>
+                this.props.statusText &&
+                <Alert variant={this.props.statusVariant}>{this.props.statusText}</Alert>
             }
             <Form>
                 <Form.Group controlId="formBasicEmail">
@@ -167,10 +137,16 @@ class RegisterView extends Component {
                                   onChange={(e) => this.changeValue(e, 'password')}/>
                     <Form.Text className="text-muted">{password_error_text}</Form.Text>
                 </Form.Group>
-                <AddUser email={this.state.email} password={this.state.password} disabled={this.state.disabled}/>
+
+                <Button variant="primary" type="submit" onClick={(e) => this.login(e)} disabled={disabled}>
+                    Sign In
+                </Button>
+                <div>
+                    {this.state.login && <Login email={this.state.email} password={this.state.password}/>}
+                </div>
             </Form>
         </div>
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RegisterView)
+export default LoginView;

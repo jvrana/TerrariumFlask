@@ -1,11 +1,11 @@
 from flask import Flask
 from flask_graphql import GraphQLView
-from application import blueprints
 from application.extensions import db, bcrypt, migrate
 from application.json_encoder import AlchemyEncoder
 from application.graphql import schema
 from config import TestingConfig
 from flask_cors import CORS
+from application.middleware import authentication_middleware
 
 def create_app(config=None):
     app = Flask(__name__, static_folder="../static/dist", template_folder=".")
@@ -18,7 +18,6 @@ def create_app(config=None):
         app.config.from_object(config)
 
     register_extensions(app)
-    register_blueprints(app)
     register_json_encoder(app)
     register_graphene(app)
 
@@ -29,10 +28,6 @@ def register_json_encoder(app):
     app.json_encoder = AlchemyEncoder
 
 
-def register_blueprints(app):
-    app.register_blueprint(blueprints.api.bp)
-
-
 def register_extensions(app):
     db.init_app(app)
     bcrypt.init_app(app)
@@ -41,7 +36,7 @@ def register_extensions(app):
 
 def register_graphene(app):
 
-    cors = CORS(app)
+    CORS(app, resources={r'/graphql': {'origins': '*'}})
 
     # single url for api
     app.add_url_rule(
@@ -52,6 +47,7 @@ def register_graphene(app):
             graphiql=True,
             context={},
             root=4,
+            middleware=[authentication_middleware],
             batch=True,
         )
     )

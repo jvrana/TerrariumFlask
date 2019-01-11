@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Jumbotron, Button } from 'react-bootstrap';
-import { PROJECT_NAME } from '../constants/application';
+import { PROJECT_NAME } from '../constants';
 
 export default class WelcomeBanner extends Component {
     render() {

@@ -1,9 +1,7 @@
-import {Provider} from 'react-redux'
 import React from 'react'
 import {render} from 'react-dom'
 import App from './App'
 import history from './history';
-import store from './store/configureStore';
 import {Router} from "react-router";
 import routes from "./routes";
 import {ApolloProvider} from 'react-apollo';
@@ -26,15 +24,13 @@ client.query({query: USERS}).then(
 );
 
 render(
-    <Provider store={store}>
+    <ApolloProvider client={client}>
         <Router history={history}>
-            <ApolloProvider client={client}>
-                <App>
-                    {routes}
-                </App>
-            </ApolloProvider>
+            <App>
+                {routes}
+            </App>
         </Router>
-    </Provider>,
+    </ApolloProvider>,
     document.getElementById('root')
 );
 

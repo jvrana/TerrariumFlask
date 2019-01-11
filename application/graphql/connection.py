@@ -10,6 +10,7 @@ class ConnectionNode(ActiveSQLAlchemyObjectType):
     class Meta:
         model = ConnectionModel
         interfaces = (relay.Node, )
+        exclude_fields = ('password',)
 
 
 class createConnection(Mutation):
