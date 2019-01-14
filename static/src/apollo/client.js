@@ -4,7 +4,20 @@ import {InMemoryCache} from 'apollo-cache-inmemory';
 import {HttpLink} from 'apollo-link-http';
 import {onError} from 'apollo-link-error';
 import { setContext } from 'apollo-link-context';
-import { AUTH_TOKEN } from './src/constants';
+import { AUTH_TOKEN } from '../constants';
+import { withClientState } from 'apollo-link-state';
+import resolvers from './resolvers';
+import defaults from './defaults';
+
+const cache = new InMemoryCache();
+
+const stateLink = withClientState({
+    cache,
+    defaults: defaults,
+    resolvers: resolvers
+});
+
+// TODO: Apollo-link-state for refreshing components...
 
 // TODO: for production, change to understand cors
 const httplink = new HttpLink({
@@ -34,7 +47,7 @@ const errlink = onError(({graphQLErrors, networkError}) => {
         );
     if (networkError) {
         console.log(`[Network error]: ${networkError}`);
-        console.log(networkError)
+        console.log(networkError);
         alert("a network error occurred")
     }
 
@@ -43,13 +56,15 @@ const errlink = onError(({graphQLErrors, networkError}) => {
 const link = ApolloLink.from([
     authLink,
     errlink,
+    stateLink,
     httplink
 ]);
 
-
 const client = new ApolloClient({
     link,
-    cache: new InMemoryCache()
+    cache: cache
 });
+
+client.writeData({data: {token: localStorage.getItem(AUTH_TOKEN)}});
 
 export default client;

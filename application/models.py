@@ -1,12 +1,14 @@
-from sqlalchemy import ForeignKey, Integer
-from sqlalchemy.ext.declarative import declarative_base
-from .database import CRUDMixin, db, Column, bcrypt, relationship
-from application.utils.auth import generate_token, verify_token
+"""database models"""
 
+from sqlalchemy import ForeignKey, Integer
+from .database import CRUDMixin, PassMixin, db, Column, bcrypt, relationship
+from pydent import AqSession
+from application.celery.tasks import ping_connection
 # Base = declarative_base()
 
+class User(CRUDMixin, PassMixin, db.Model):
+    """Basic user model"""
 
-class User(CRUDMixin, db.Model):
     id = Column(db.Integer(), primary_key=True)
     email = Column(db.String(255), unique=True)
     password = Column(db.String(255))
@@ -16,19 +18,6 @@ class User(CRUDMixin, db.Model):
         self.email = email
         self.active = True
         self.password = User.hashed_password(password)
-
-    def generate_token(self):
-        return generate_token(self, keys=['id', 'email'])
-
-    @classmethod
-    def from_token(cls, token):
-        data = verify_token(token)
-        model = cls.query.filter_by(id=data['id']).first()
-        return model
-
-    @staticmethod
-    def hashed_password(password):
-        return bcrypt.generate_password_hash(password).decode("utf-8")
 
     @staticmethod
     def get_user_with_email_and_password(email, password):
@@ -42,37 +31,46 @@ class User(CRUDMixin, db.Model):
         return ['id', 'email']
 
 
-class APIConnection(CRUDMixin, db.Model):
+# TODO: safely store API connection passwords
+class APIConnection(CRUDMixin, PassMixin, db.Model):
+    """An APIConnection model that store login credentials for an
+    api connection."""
+
     __tablename__ = 'api_connection'
 
     id = Column(db.Integer(), primary_key=True)
+    name = Column(db.String(25))
     login = Column(db.String(25))
     password = Column(db.String(255))
     url = Column(db.String(255))
     user = relationship("User", back_populates="api_connections")
     user_id = Column(Integer, ForeignKey('user.id'))
 
-    def __init__(self, login, password, url, user):
+    TOKEN_FIELDS = ['login', 'url', 'id']
+
+    def __init__(self, name, login, password, url, user):
+        self.name = name
         self.login = login
         self.active = True
-        self.password = APIConnection.hashed_password(password)
+        self.password = password  # TODO: what to do about storing passwords??? self.hashed_password(password)
         self.url = url
-        print(user)
         self.user = user
 
-    @staticmethod
-    def hashed_password(password):
-        return bcrypt.generate_password_hash(password).decode("utf-8")
+    def session(self):
+        session = AqSession(self.login, self.password, self.url)
+        return session
 
-    def generate_token(self):
-        token = generate_token(self, keys=['login', 'url', 'id'])
-        return token
+    def ping(self):
+        """Get the average request speed of the connection in seconds"""
+        print("Pinging...")
+        num = 5
+        ping = self.session().ping(num=num)
+        return ping/num
 
-    @classmethod
-    def from_token(cls, token):
-        data = verify_token(token)
-        model = cls.query.filter_by(id=data['id']).first()
-        return model
+    def async_ping(self):
+        session = self.session()
+        task = ping_connection(session).delay()
+        return task.id
 
     def __json__(self):
         return ['id', 'login', 'url', 'user_id', 'user']

@@ -15,6 +15,8 @@ def generate_token(model, expiration=TWO_WEEKS, keys=['id', 'email']):
 
 
 def verify_token(token):
+    if token is None:
+        return None
     s = Serializer(current_app.config['SECRET_KEY'])
     try:
         data = s.loads(token)

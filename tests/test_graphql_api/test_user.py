@@ -44,7 +44,7 @@ def test_connection(graphql_client):
 
     connection_mutation = '''
     mutation myMutation($user_id: ID!) {
-      createConnection(login: "mylogin", password: "mypassword", url: "myurl", userId: $user_id) {
+      createConnection(name: "mynewconnection", login: "mylogin", password: "mypassword", url: "myurl", userId: $user_id) {
         connection {
             id
         }
@@ -53,4 +53,18 @@ def test_connection(graphql_client):
     '''.strip()
 
     res = graphql_client.execute(connection_mutation, variables={'user_id': user_id})
-    print(res)
+    assert not res.get('errors', None)
+    connection_id = res['data']['createConnection']['connection']['id']
+
+    edit_mutation = '''
+    mutation editConnection($id: ID!) {
+        editConnection(id: $id) {
+            connection {
+                id
+            }   
+        }
+    }
+    '''
+
+    res = graphql_client.execute(edit_mutation, variables={'id': connection_id})
+    assert not res.get('errors', None)

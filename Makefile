@@ -12,3 +12,7 @@ create:
 
 run:
 	pipenv run python manage.py runserver
+
+
+worker:
+	sudo celery -A application worker -E -l INFO

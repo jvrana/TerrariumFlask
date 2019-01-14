@@ -5,6 +5,7 @@ from application import db
 from application.models import User as UserModel
 from application.graphql.base import ActiveSQLAlchemyObjectType
 from graphql import GraphQLError
+from sqlalchemy.exc import IntegrityError
 
 
 class UserNode(ActiveSQLAlchemyObjectType):
@@ -31,5 +32,6 @@ class createUser(Mutation):
             token = new_user.generate_token()
             ok = True
             return createUser(ok=ok, user=new_user, token=token)
-        except Exception:
-            raise GraphQLError("User creation failed")
+        except IntegrityError as e:
+            print(str(e))
+            raise GraphQLError("User '{}' already exists.".format(email))

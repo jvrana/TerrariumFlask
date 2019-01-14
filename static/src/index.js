@@ -5,7 +5,7 @@ import history from './history';
 import {Router} from "react-router";
 import routes from "./routes";
 import {ApolloProvider} from 'react-apollo';
-import client from '../client';
+import client from './apollo/client';
 import gql from "graphql-tag";
 
 const USERS = gql`

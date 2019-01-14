@@ -2,6 +2,7 @@ import os
 
 here = os.path.dirname(os.path.abspath(__file__))
 
+
 class BaseConfig(object):
     SECRET_KEY = "He<Zv]A!k9/bX's"
     DEBUG = True
@@ -17,6 +18,9 @@ class TestingConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     DEBUG_TB_ENABLED = True
     PRESERVE_CONTEXT_ON_EXCEPTION = False
+    CELERY_BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+    CELERY_IGNORE_RESULT = False
 
 
 class TestingSQLConfig(BaseConfig):

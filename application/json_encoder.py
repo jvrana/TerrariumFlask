@@ -1,3 +1,5 @@
+"""JSON encoder for SQLAlchemy"""
+
 from sqlalchemy.ext.declarative import DeclarativeMeta
 import json
 

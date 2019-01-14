@@ -14,6 +14,10 @@ graphene = "*"
 graphene-sqlalchemy = "*"
 flask-cors = "*"
 flask-jwt-extended = "*"
+pydent = {path = "./../trident"}
+celery = {extras = ["redis"],version = "*"}
+aquariumautoplanner = "*"
+autoplanner = {path = "./../AquariumAutoPlanner"}
 
 [dev-packages]
 pytest = "*"

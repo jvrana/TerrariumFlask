@@ -4,11 +4,14 @@ from application import create_app
 from application.database import db as _db
 from webtest import TestApp
 
+TEST_CONFIG = "tests.pytest_config"  # located at tests/pytest_config.py
 
 @pytest.fixture
 def app():
     """An application for the tests."""
-    _app = create_app('tests.settings')
+    _app = create_app(TEST_CONFIG)
+    if not _app.config['ENV'] == 'pytests':
+        raise Exception("Cannot run tests, pytest config settings at '{}' are not properly loaded.".format(TEST_CONFIG))
     ctx = _app.test_request_context()
     ctx.push()
 

@@ -1,34 +1,27 @@
 import React from 'react';
-import {Query} from 'react-apollo';
+import {Query, Mutation} from 'react-apollo';
 import {Alert, Button, Form} from 'react-bootstrap';
 import {isEmail, isURL} from 'validator';
-import {AUTH_TOKEN} from '../constants';
-
-import gql from 'graphql-tag';
-
-const GET_USER = gql`
-    query getToken($email: String!, $password: String!) {
-        token(email: $email, password: $password)
-    }
-`;
+import {GET_TOKEN} from '../graphql/queries';
+import { loginWithToken } from '../utils';
 
 const Login = ({email, password}) => (
-    <Query query={GET_USER} variables={{email, password}}>
+    <Query query={GET_TOKEN} variables={{email, password}}>
         {
-            ({loading, error, data}) => {
+            ({loading, error, data, client}) => {
                 if (loading) return "Loading...";
 
                 if (error) return <Alert variant={"danger"}>Error! {error.message}</Alert>;
 
                 if (data.errors) return 'Error!';
-                localStorage.setItem(AUTH_TOKEN, data.token);
+                loginWithToken(client, data.token);
                 return <Alert key={2} variant={"success"}> Logged in</Alert>
             }
         }
     </Query>
 );
 
-class LoginView extends React.Component {
+class LoginForm extends React.Component {
 
     constructor() {
         super();
@@ -36,11 +29,9 @@ class LoginView extends React.Component {
         this.state = {
             email: "",
             password: "",
-            url: "",
             login: false,
             email_error_text: null,
             password_error_text: null,
-            url_error_text: null,
             redirectTo: redirectRoute,
             disabled: true,
         };
@@ -102,14 +93,6 @@ class LoginView extends React.Component {
         });
     }
 
-    _handleKeyPress(e) {
-        if (e.key === 'Enter') {
-            if (!this.state.disabled) {
-                this.login(e);
-            }
-        }
-    }
-
     login(e) {
         e.preventDefault();
         this.setState({'login': true});
@@ -149,4 +132,4 @@ class LoginView extends React.Component {
     }
 }
 
-export default LoginView;
+export default LoginForm;
