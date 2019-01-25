@@ -163,3 +163,5 @@ fabric.properties
 /static/dist
 /static/yarn-error.log
 *.iml
+
+*db
