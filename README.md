@@ -1,5 +1,9 @@
 # TerrariumFlask
 
+## License
+
+Feb 4 2019 - This software is not licensed. The author (Justin D. Vrana of University of Washington) does not grant permission to copy or modify code base.
+
 **Starting backend**:
 
 `python manage.py runserver`
